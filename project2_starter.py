@@ -1,7 +1,7 @@
 # SI 201 HW4 (Library Checkout System)
-# Your name:
-# Your student id:
-# Your email:
+# Your name: Atharva Rai
+# Your student id: 8360 6890
+# Your email: avirai@umich.edu
 # Who or what you worked with on this homework (including generative AI like ChatGPT):
 # If you worked with generative AI also add a statement for how you used it.
 # e.g.:
@@ -41,7 +41,26 @@ def load_listing_results(html_path) -> list[tuple]:
     # ==============================
     # YOUR CODE STARTS HERE
     # ==============================
-    pass
+    with open(html_path, encoding="utf-8-sig") as f:
+        soup = BeautifulSoup(f, 'html.parser')
+ 
+    results = []
+ 
+    # Find all anchor tags whose href contains /rooms/<numeric_id>
+    for a in soup.find_all('a', href=re.compile(r'/rooms/\d+')):
+        href = a.get('href', '')
+        id_match = re.search(r'/rooms/(\d+)', href)
+        if not id_match:
+            continue
+        listing_id = id_match.group(1)
+ 
+        # The listing title is in a child div with class 'listing-name'
+        title_div = a.find('div', class_='listing-name')
+        if title_div:
+            title = title_div.get_text(strip=True)
+            results.append((title, listing_id))
+ 
+    return results
     # ==============================
     # YOUR CODE ENDS HERE
     # ==============================
@@ -70,7 +89,84 @@ def get_listing_details(listing_id) -> dict:
     # ==============================
     # YOUR CODE STARTS HERE
     # ==============================
-    pass
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(base_dir, "html_files", f"listing_{listing_id}.html")
+ 
+    with open(path, encoding="utf-8-sig") as f:
+        soup = BeautifulSoup(f, 'html.parser')
+ 
+    text = soup.get_text(' ', strip=True)
+ 
+    pol_match = re.search(r'Policy number[:\s]*(\S+)', text, re.IGNORECASE)
+    if pol_match:
+        raw = pol_match.group(1).strip().rstrip('.')
+        raw = re.sub(r'[\ufeff\u200b\r\n]', '', raw)
+        if re.search(r'pending', raw, re.IGNORECASE):
+            policy_number = "Pending"
+        elif re.search(r'exempt', raw, re.IGNORECASE):
+            policy_number = "Exempt"
+        else:
+            policy_number = raw
+    else:
+        policy_number = "Pending"
+ 
+    host_type = "Superhost" if "Superhost" in text else "regular"
+ 
+
+    host_name = ""
+    room_type = "Entire Room"
+ 
+    for h2 in soup.find_all('h2'):
+        h2_text = h2.get_text(strip=True)
+        m = re.search(r'hosted by\s+(.+)', h2_text, re.IGNORECASE)
+        if m:
+            raw_name = m.group(1).replace('\xa0', ' ').strip()
+            host_name = raw_name
+ 
+            # Determine room type from the subtitle text
+            lower = h2_text.lower()
+            if 'private' in lower:
+                room_type = "Private Room"
+            elif 'shared' in lower:
+                room_type = "Shared Room"
+            else:
+                room_type = "Entire Room"
+            break
+ 
+    if not host_name:
+        m = re.search(
+            r'(?:entire|private|shared)?[\w\s]*hosted by\s+([\w\s&]+?)'
+            r'(?:\s+\d+\s+guests|\s+Joined|\s+[\d]+\.\d)',
+            text, re.IGNORECASE
+        )
+        if m:
+            raw_name = m.group(1).replace('\xa0', ' ').strip()
+            host_name = raw_name
+ 
+        # Room type from text context around "hosted by"
+        m2 = re.search(r'(private|shared|entire)\s+\w+\s+(?:in\s+\w+\s+)?hosted by',
+                       text, re.IGNORECASE)
+        if m2:
+            keyword = m2.group(1).lower()
+            if keyword == 'private':
+                room_type = "Private Room"
+            elif keyword == 'shared':
+                room_type = "Shared Room"
+            else:
+                room_type = "Entire Room"
+ 
+    loc_match = re.search(r'Location\s+([\d.]+)', text)
+    location_rating = float(loc_match.group(1)) if loc_match else 0.0
+ 
+    return {
+        listing_id: {
+            "policy_number": policy_number,
+            "host_type": host_type,
+            "host_name": host_name,
+            "room_type": room_type,
+            "location_rating": location_rating
+        }
+    }
     # ==============================
     # YOUR CODE ENDS HERE
     # ==============================
