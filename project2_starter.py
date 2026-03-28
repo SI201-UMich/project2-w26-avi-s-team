@@ -226,7 +226,18 @@ def output_csv(data, filename) -> None:
     # ==============================
     # YOUR CODE STARTS HERE
     # ==============================
-    pass
+    sorted_data = sorted(data, key=lambda row: row[6], reverse=True)
+ 
+    with open(filename, 'w', newline='', encoding="utf-8-sig") as f:
+        writer = csv.writer(f)
+        # Header row
+        writer.writerow([
+            "Listing Title", "Listing ID", "Policy Number",
+            "Host Type", "Host Name", "Room Type", "Location Rating"
+        ])
+        # Data rows
+        for row in sorted_data:
+            writer.writerow(row)
     # ==============================
     # YOUR CODE ENDS HERE
     # ==============================
@@ -249,7 +260,21 @@ def avg_location_rating_by_room_type(data) -> dict:
     # ==============================
     # YOUR CODE STARTS HERE
     # ==============================
-    pass
+    totals = {}
+    counts = {}
+ 
+    for row in data:
+        room_type = row[5]
+        rating = row[6]
+        if rating == 0.0:
+            continue  # Exclude listings with no rating
+        totals[room_type] = totals.get(room_type, 0.0) + rating
+        counts[room_type] = counts.get(room_type, 0) + 1
+ 
+    return {
+        room_type: round(totals[room_type] / counts[room_type], 2)
+        for room_type in totals
+    }
     # ==============================
     # YOUR CODE ENDS HERE
     # ==============================
@@ -270,7 +295,21 @@ def validate_policy_numbers(data) -> list[str]:
     # ==============================
     # YOUR CODE STARTS HERE
     # ==============================
-    pass
+    valid_pattern = re.compile(r'^(20\d{2}-00\d{4}STR|STR-000\d{4})$')
+ 
+    invalid_ids = []
+    for row in data:
+        listing_id = row[1]
+        policy = row[2]
+ 
+        # Skip Pending and Exempt
+        if policy in ("Pending", "Exempt"):
+            continue
+ 
+        if not valid_pattern.match(policy):
+            invalid_ids.append(listing_id)
+ 
+    return invalid_ids
     # ==============================
     # YOUR CODE ENDS HERE
     # ==============================
