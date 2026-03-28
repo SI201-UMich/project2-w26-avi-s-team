@@ -1,0 +1,35 @@
+Reflective Questions
+
+I do not think the current system provides adequate accountability around short-term rentals in San Francisco. 
+On paper, it sounds strong because multiple parties are involved: hosts must register, Airbnb must display registration 
+information, and third parties can scrape listings and report possible violations. In practice, though, this setup puts too much 
+responsibility on outside observers instead of the platform and the city. If enforcement depends on independent researchers 
+scraping listings and filing complaints, then accountability is reactive rather than built into the system. It also allows 
+hosts and platforms to benefit from weak enforcement unless someone else takes the time to investigate. From the perspective 
+of the Software Engineering Code of Ethics, this seems inadequate because software professionals are supposed to act in the 
+public interest and ensure their products meet high professional standards. A better system would require Airbnb to automatically 
+verify registration numbers directly with the city before a listing can go live, rather than merely displaying whatever 
+information a host enters. That would shift accountability toward prevention instead of after-the-fact detection and would better 
+protect neighborhoods, tenants, and the public.
+
+One important factor to consider when discussing the legality of web scraping is whether the data is publicly accessible or 
+whether access restrictions were bypassed. This matters because recent U.S. cases have suggested that scraping truly public data 
+is treated differently from accessing password-protected or blocked systems. In Van Buren v. United States, the Supreme Court 
+narrowed the scope of the Computer Fraud and Abuse Act by focusing on whether someone accessed areas of a computer that were 
+actually off-limits, not just whether they used information for an improper purpose. In the hiQ v. LinkedIn litigation, courts 
+also treated scraping of public LinkedIn profiles differently from hacking into private data, even though other claims such as 
+breach of contract could still apply. That distinction is important because it shows that legality is not simply about whether 
+scraping happens, but about how the scraping is done, what protections are in place, and whether the scraper ignored technical 
+or contractual barriers. To me, this is one of the most important factors because it separates scraping that gathers open public
+information from scraping that resembles unauthorized intrusion.
+
+When deciding whether web scraping is ethical, I think at least two guidelines are essential. First, the scraper should consider
+whether people reasonably expected their data to be collected and reused in that way, even if the information was technically
+public. The Cambridge Analytica scandal showed how data can be harvested and repurposed on a massive scale without meaningful
+consent, producing serious harms for users and public trust. Clearview AI raises a similar concern because it built a 
+facial-recognition database from huge numbers of online images, which many people never expected would be turned into a
+surveillance tool. Second, the scraper should evaluate whether the social benefit outweighs the risk of harm. Scraping
+can support accountability, journalism, and research, but it can also enable surveillance, manipulation, and privacy
+violations. I would add that data collection should be minimized to only what is necessary for the public-interest goal,
+and the collected information should not be reused for unrelated purposes. In other words, ethical scraping should be 
+transparent, limited, and clearly justified, not based on the idea that “public” automatically means “fair game.”
